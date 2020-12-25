@@ -15,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
+import com.alibaba.fastjson.JSON;
 import com.tuya.smart.android.user.api.ILoginCallback;
 import com.tuya.smart.android.user.bean.User;
 import com.tuya.smart.sdk.api.ITuyaActivatorGetToken;
@@ -84,6 +85,9 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
       case "set_ap_net":
         this.setAP(call.argument("ssid").toString(), call.argument("password").toString(),call.argument("token").toString());
         break;
+        case "uid_login":
+        this.uidLogin(call.argument("countryCode").toString(), call.argument("uid").toString(),call.argument("passwd").toString());
+        break;
       default:
         result.success("Android " + android.os.Build.VERSION.RELEASE);
         break;
@@ -141,11 +145,13 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
               @Override
               public void onError(String error, String s1) {
                 //                resultError(WHAT_AP_ACTIVE_ERROR, error, s1);
+                callResult(WHAT_AP_ACTIVE_ERROR, error);
               }
 
               @Override
               public void onActiveSuccess(DeviceBean gwDevResp) {
                 //                resultSuccess(WHAT_AP_ACTIVE_SUCCESS, gwDevResp);
+                callResult(WHAT_AP_ACTIVE_SUCCESS, gwDevResp.getDevId());
               }
 
               @Override
@@ -153,9 +159,12 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
                 switch (step) {
                   case ActivatorAPStepCode.DEVICE_BIND_SUCCESS:
                     //                    resultSuccess(WHAT_BIND_DEVICE_SUCCESS, o);
+                    callResult(WHAT_AP_ACTIVE_SUCCESS,"WHAT_BIND_DEVICE_SUCCESS");
                     break;
                   case ActivatorAPStepCode.DEVICE_FIND:
                     //                    resultSuccess(WHAT_DEVICE_FIND, o);
+                    callResult(WHAT_DEVICE_FIND,"WHAT_DEVICE_FIND");
+
                     break;
                 }
               }
@@ -165,6 +174,24 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
 
   }
 
+  //uid登陆
+
+  public void uidLogin(String countryCode, String uid, String passwd) {
+    System.out.println("开始uidLogin");
+    TuyaHomeSdk.getUserInstance().loginOrRegisterWithUid(countryCode,uid,passwd, new ILoginCallback() {
+      @Override
+      public void onSuccess(User user) {
+        System.out.println("登陆成功"+JSON.toJSONString(user));
+        callResult(200, JSON.toJSONString(user));
+      }
+
+      @Override
+      public void onError(String code, String error) {
+        System.out.println("登陆错误，错误code " + code +"error"+error);
+        callResult(400, error);
+      }
+    });
+  }
   ////////////////////辅助方法//////////////////
   /*
    * 传递消息给Flutter层

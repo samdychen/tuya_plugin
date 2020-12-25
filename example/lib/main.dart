@@ -89,6 +89,15 @@ class _MyAppState extends State<MyApp> {
                   });
                 },
               ),
+              RaisedButton(
+                child: Text('uid 配网'),
+                onPressed: () {
+                  this._controller.uidLogin("86", "ay1601999815506sfsRd","331b005c778bebb65984708ee234ea5b").then((value) {
+                    Fluttertoast.showToast(msg: value.msg.toString());
+                    print("接受到返回数据"+value.toString());
+                  });
+                }
+              ),
             ],
           ),
         ),

@@ -36,10 +36,20 @@ class TuyaPlugin {
   }
   // AP配网
   Future<TuYaResult> setApNet(String ssid, String password,String token) async {
-    var info = await _channel.invokeMethod("set_ec_net", {
+    var info = await _channel.invokeMethod("set_ap_net", {
       'ssid': ssid,
       'password': password,
       'token': token,
+    });
+
+    return this.handleResult(info);
+  }
+
+  Future<TuYaResult> uidLogin(String countryCode, String uid, String passwd) async {
+    var info = await _channel.invokeMethod("uid_login", {
+      'countryCode': countryCode,
+      'uid': uid,
+      'passwd': passwd,
     });
 
     return this.handleResult(info);
