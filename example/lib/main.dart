@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -15,33 +16,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   TuyaPlugin _controller = new TuyaPlugin();
+  Dio dio = new Dio();
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  String ssid;
+  String password;
+
+
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await TuyaPlugin.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -51,15 +36,56 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
+        body: Form(
+          key: _formKey,
           child: Column(
             children: [
-              Text('Running on: $_platformVersion\n'),
+              TextFormField(
+                decoration: InputDecoration(
+                    hintText: "ssid"
+                ),
+                onSaved: (v){
+                  setState(() {
+                    ssid=v;
+                  });
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                    hintText: "password"
+                ),
+                onSaved: (v){
+                  setState(() {
+                    password=v;
+                  });
+                },
+              ),
+
               RaisedButton(
                 child: Text('EC 配网'),
                 onPressed: () {
-                  this._controller.setECNet('123', 'tangyue', '123456').then((value) {
-                    Fluttertoast.showToast(msg: value.msg.toString());
+                  _formKey.currentState.save();
+                  dio.post("https://us-central1-my-first-action-project-96da6.cloudfunctions.net/get_tuya_pairing_token", data: {"tuya_user_id": "ay15956109400526lf4b"}).then((response) {
+                    if(response.data["code"]==200){
+                      print(response.data['data']['region']+response.data['data']['token']+response.data['data']['secret']);
+                      this._controller.setECNet(ssid, password,response.data['data']['region']+response.data['data']['token']+response.data['data']['secret']).then((value) {
+                        Fluttertoast.showToast(msg: value.msg.toString());
+                      });
+                    }
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Text('Ap 配网'),
+                onPressed: () {
+                  _formKey.currentState.save();
+                  dio.post("https://us-central1-my-first-action-project-96da6.cloudfunctions.net/get_tuya_pairing_token", data: {"tuya_user_id": "ay15956109400526lf4b"}).then((response) {
+                    if(response.data["code"]==200){
+                      print(response.data['data']['region']+response.data['data']['token']+response.data['data']['secret']);
+                      this._controller.setApNet(ssid, password,response.data['data']['region']+response.data['data']['token']+response.data['data']['secret']).then((value) {
+                        Fluttertoast.showToast(msg: value.msg.toString());
+                      });
+                    }
                   });
                 },
               ),

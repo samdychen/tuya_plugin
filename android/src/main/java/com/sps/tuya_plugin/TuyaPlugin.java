@@ -15,6 +15,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
+import com.tuya.smart.android.user.api.ILoginCallback;
+import com.tuya.smart.android.user.bean.User;
 import com.tuya.smart.sdk.api.ITuyaActivatorGetToken;
 import com.tuya.smart.home.sdk.TuyaHomeSdk;
 import com.tuya.smart.home.sdk.builder.ActivatorBuilder;
@@ -65,8 +67,8 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     this.mContext = flutterPluginBinding.getApplicationContext();
+    TuyaHomeSdk.init((Application) flutterPluginBinding.getApplicationContext(),"4m7nm8j79ar8xxvjqu89","5h59ed4dsxw3rgtgjwpsfnhey5nggapt");
     TuyaHomeSdk.setDebugMode(true);
-    TuyaHomeSdk.init((Application) flutterPluginBinding.getApplicationContext());
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "tuya_plugin");
     channel.setMethodCallHandler(this);
   }
@@ -77,7 +79,10 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
 
     switch (call.method) {
       case "set_ec_net":
-        this.getNetToken(Long.parseLong(call.argument("homeId").toString()), call.argument("ssid").toString(), call.argument("password").toString());
+        this.setEC(call.argument("ssid").toString(), call.argument("password").toString(),call.argument("token").toString());
+        break;
+      case "set_ap_net":
+        this.setAP(call.argument("ssid").toString(), call.argument("password").toString(),call.argument("token").toString());
         break;
       default:
         result.success("Android " + android.os.Build.VERSION.RELEASE);
@@ -90,27 +95,11 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
     channel.setMethodCallHandler(null);
   }
 
-  // 获取配网 token
-  public void getNetToken (long homeId, final String ssid, final String password) {
-    TuyaHomeSdk.getActivatorInstance().getActivatorToken(homeId, new ITuyaActivatorGetToken() {
-
-      @Override
-      public void onSuccess(String token) {
-        System.out.println("-------------" + token);
-        setEC(ssid, password, token);
-      }
-
-      @Override
-      public void onFailure(String s, String s1) {
-        callResult(ERROR_CODE_PARAMS_ERROR, "token 获取失败");
-      }
-    });
-  }
-
   // 快连（EZ）模式
   public void setEC(String ssid, String password, String token) {
+    System.out.println("开始快连（EZ）模式配网");
     mModelEnum = TY_EZ;
-    TuyaHomeSdk.getActivatorInstance().newMultiActivator(new ActivatorBuilder()
+    ITuyaActivator ECActivator =  TuyaHomeSdk.getActivatorInstance().newMultiActivator(new ActivatorBuilder()
             .setSsid(ssid)
             .setContext(mContext)
             .setPassword(password)
@@ -119,11 +108,13 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
             .setToken(token).setListener(new ITuyaSmartActivatorListener() {
               @Override
               public void onError(String s, String s1) {
+                System.out.println("快连（EZ）模式配网失败");
                 callResult(ERROR_CODE_PARAMS_ERROR, "快连（EZ）模式配网失败");
               }
 
               @Override
               public void onActiveSuccess(DeviceBean deviceBean) {
+                System.out.println("快连（EZ）模式配网失败");
                 callResult(SUCCESS_CODE, "快连（EZ）模式配网成功");
               }
 
@@ -133,10 +124,12 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
               }
             })
     );
+    ECActivator.start();
   }
 
   // 热点（AP）模式
   public void setAP(String ssid, String password, String token) {
+    System.out.println("开始快连（AP）模式配网");
     mModelEnum = TY_AP;
     mTuyaActivator = TuyaHomeSdk.getActivatorInstance().newActivator(new ActivatorBuilder()
             .setSsid(ssid)
@@ -167,6 +160,8 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
                 }
               }
             }));
+
+    mTuyaActivator.start();
 
   }
 

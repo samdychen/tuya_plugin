@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  dio: ^3.0.10
   tuya_plugin:
     # When depending on this package from a real application you should use:
     #   tuya_plugin: ^x.y.z

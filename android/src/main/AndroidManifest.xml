@@ -3,11 +3,5 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="tuya_flutter_plugin_example">
-        <meta-data
-            android:name="TUYA_SMART_APPKEY"
-            android:value="4m7nm8j79ar8xxvjqu89" />
-        <meta-data
-            android:name="TUYA_SMART_SECRET"
-            android:value="5h59ed4dsxw3rgtgjwpsfnhey5nggapt" />
     </application>
 </manifest>

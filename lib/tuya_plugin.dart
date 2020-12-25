@@ -25,11 +25,21 @@ class TuyaPlugin {
   }
 
   // 配网
-  Future<TuYaResult> setECNet(String homeId, String ssid, String password) async {
+  Future<TuYaResult> setECNet(String ssid, String password,String token) async {
     var info = await _channel.invokeMethod("set_ec_net", {
-      'homeId': homeId,
       'ssid': ssid,
       'password': password,
+      'token': token,
+    });
+
+    return this.handleResult(info);
+  }
+  // AP配网
+  Future<TuYaResult> setApNet(String ssid, String password,String token) async {
+    var info = await _channel.invokeMethod("set_ec_net", {
+      'ssid': ssid,
+      'password': password,
+      'token': token,
     });
 
     return this.handleResult(info);
