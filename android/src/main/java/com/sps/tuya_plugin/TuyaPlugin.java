@@ -68,8 +68,8 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     this.mContext = flutterPluginBinding.getApplicationContext();
-    TuyaHomeSdk.init((Application) flutterPluginBinding.getApplicationContext(),"4m7nm8j79ar8xxvjqu89","5h59ed4dsxw3rgtgjwpsfnhey5nggapt");
     TuyaHomeSdk.setDebugMode(true);
+    TuyaHomeSdk.init((Application) flutterPluginBinding.getApplicationContext(),"e597q33jgr4tnm3fgj83","gdau9an95apxug4hc8xm53aftnugr3g5");
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "tuya_plugin");
     channel.setMethodCallHandler(this);
   }
@@ -85,9 +85,15 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
       case "set_ap_net":
         this.setAP(call.argument("ssid").toString(), call.argument("password").toString(),call.argument("token").toString());
         break;
-        case "uid_login":
+      case "uid_login":
         this.uidLogin(call.argument("countryCode").toString(), call.argument("uid").toString(),call.argument("passwd").toString());
         break;
+      case "destroy":
+        System.out.println("销毁涂鸦插件实例");
+        TuyaHomeSdk.onDestroy();
+        break;
+      case "stopAP":
+        this.stopAP();
       default:
         result.success("Android " + android.os.Build.VERSION.RELEASE);
         break;
@@ -118,7 +124,7 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
 
               @Override
               public void onActiveSuccess(DeviceBean deviceBean) {
-                System.out.println("快连（EZ）模式配网失败");
+                System.out.println("快连（EZ）模式配网成功");
                 callResult(SUCCESS_CODE, "快连（EZ）模式配网成功");
               }
 
@@ -145,12 +151,15 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
               @Override
               public void onError(String error, String s1) {
                 //                resultError(WHAT_AP_ACTIVE_ERROR, error, s1);
+                System.out.println("AP配网失败");
+                System.out.println(error);
                 callResult(WHAT_AP_ACTIVE_ERROR, error);
               }
 
               @Override
               public void onActiveSuccess(DeviceBean gwDevResp) {
                 //                resultSuccess(WHAT_AP_ACTIVE_SUCCESS, gwDevResp);
+                System.out.println("AP配网成功");
                 callResult(WHAT_AP_ACTIVE_SUCCESS, gwDevResp.getDevId());
               }
 
@@ -159,10 +168,12 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
                 switch (step) {
                   case ActivatorAPStepCode.DEVICE_BIND_SUCCESS:
                     //                    resultSuccess(WHAT_BIND_DEVICE_SUCCESS, o);
+                    System.out.println("AP配网设备绑定成功");
                     callResult(WHAT_AP_ACTIVE_SUCCESS,"WHAT_BIND_DEVICE_SUCCESS");
                     break;
                   case ActivatorAPStepCode.DEVICE_FIND:
                     //                    resultSuccess(WHAT_DEVICE_FIND, o);
+                    System.out.println("AP配网发现设备");
                     callResult(WHAT_DEVICE_FIND,"WHAT_DEVICE_FIND");
 
                     break;
@@ -174,8 +185,19 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
 
   }
 
-  //uid登陆
+  // 停止（AP）模式配网
+  public void stopAP() {
+    System.out.println("停止AP配网");
+    try {
+      mTuyaActivator.stop();
+    }
+    catch (Exception e) {
 
+    }
+
+  }
+
+  //uid登陆
   public void uidLogin(String countryCode, String uid, String passwd) {
     System.out.println("开始uidLogin");
     TuyaHomeSdk.getUserInstance().loginOrRegisterWithUid(countryCode,uid,passwd, new ILoginCallback() {
@@ -197,13 +219,18 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
    * 传递消息给Flutter层
    * */
   public void callResult(int code, String msg) {
-    HashMap<String, String> map = new HashMap<>();
-    map.put("code", String.format("%d", code));
-    map.put("msg", msg);
+    try {
+      HashMap<String, String> map = new HashMap<>();
+      map.put("code", String.format("%d", code));
+      map.put("msg", msg);
 
-    Message message = Message.obtain();
-    message.obj = map;
-    result.success(map);
+      Message message = Message.obtain();
+      message.obj = map;
+      result.success(map);
+    }
+    catch (Exception e) {
+
+    }
   }
 
   /*

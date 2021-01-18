@@ -54,6 +54,14 @@ class TuyaPlugin {
 
     return this.handleResult(info);
   }
+
+  Future<void> destroy() async {
+    var info = await _channel.invokeMethod("destroy", {});
+  }
+
+  Future<void> stopAP() async {
+    var info = await _channel.invokeMethod("stopAP", {});
+  }
 }
 
 /// 返回结果
