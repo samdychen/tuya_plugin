@@ -2,6 +2,9 @@
 
 A new Flutter plugin.
 
+## Change Log
+#### First commit
+
 ## Getting Started
 
 This project is a starting point for a Flutter
