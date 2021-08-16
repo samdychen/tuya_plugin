@@ -1,3 +1,5 @@
+package com.sps.tuya_plugin;
+
 public class AppKey {
     // dev: e597q33jgr4tnm3fgj83, gdau9an95apxug4hc8xm53aftnugr3g5
     // uat: pwn7wanmg3ka7qxs5hq7, 98g3rxhqd7gc739ypcay8n9mxrmsnycd

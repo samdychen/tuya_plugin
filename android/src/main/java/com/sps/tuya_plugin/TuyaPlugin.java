@@ -31,8 +31,6 @@ import com.tuya.smart.sdk.enums.ActivatorModelEnum;
 import static com.tuya.smart.sdk.enums.ActivatorModelEnum.TY_AP;
 import static com.tuya.smart.sdk.enums.ActivatorModelEnum.TY_EZ;
 
-import AppKey;
-
 /** TuyaPlugin */
 public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
   /// The MethodChannel that will the communication between Flutter and native Android
