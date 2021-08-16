@@ -31,6 +31,8 @@ import com.tuya.smart.sdk.enums.ActivatorModelEnum;
 import static com.tuya.smart.sdk.enums.ActivatorModelEnum.TY_AP;
 import static com.tuya.smart.sdk.enums.ActivatorModelEnum.TY_EZ;
 
+import com.sps.tuya_plugin.AppKey;
+
 /** TuyaPlugin */
 public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
   /// The MethodChannel that will the communication between Flutter and native Android
@@ -69,7 +71,7 @@ public class TuyaPlugin implements FlutterPlugin, MethodCallHandler {
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     this.mContext = flutterPluginBinding.getApplicationContext();
     TuyaHomeSdk.setDebugMode(true);
-    TuyaHomeSdk.init((Application) flutterPluginBinding.getApplicationContext(),"e597q33jgr4tnm3fgj83","gdau9an95apxug4hc8xm53aftnugr3g5");
+    TuyaHomeSdk.init((Application) flutterPluginBinding.getApplicationContext(), AppKey.KEY, AppKey.SECRET);
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "tuya_plugin");
     channel.setMethodCallHandler(this);
   }

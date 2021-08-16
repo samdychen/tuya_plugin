@@ -1,6 +1,12 @@
 #import "TuyaPlugin.h"
+#import "AppKey.h"
 #import <TuyaSmartHomeKit/TuyaSmartKit.h>
 #import <Foundation/Foundation.h>
+
+// // DEV: c9hh5yam7xh3dnrdngh3, csdhmfg943w8qkxjarke8gw4h7dnhcng
+// // UAT: n9waratyf5etpdukara3, cymwhdcgnm9xsupcjmv9q8k87exdgjga
+// static NSString APP_KEY = @"n9waratyf5etpdukara3";
+// static NSString APP_SECRET = @"cymwhdcgnm9xsupcjmv9q8k87exdgjga";
 
 static NSString *STATUS_FAILURE_WITH_NETWORK_ERROR = @"1001";
 static NSString *STATUS_FAILURE_WITH_BIND_GWIDS = @"1002";
@@ -37,10 +43,10 @@ typedef enum {
     
     TuyaPlugin* instance = [[TuyaPlugin alloc] init];
     
-    [TuyaSmartSDK sharedInstance].appGroupId = @"group.spsspsty";
+    [TuyaSmartSDK sharedInstance].appGroupId = APP_GROUP_ID;
     
     [[TuyaSmartSDK sharedInstance] setDebugMode:YES];
-    [[TuyaSmartSDK sharedInstance] startWithAppKey:@"c9hh5yam7xh3dnrdngh3" secretKey:@"csdhmfg943w8qkxjarke8gw4h7dnhcng"];
+    [[TuyaSmartSDK sharedInstance] startWithAppKey:APP_KEY secretKey:APP_SECRET];
     
     [registrar addMethodCallDelegate:instance channel:channel];
 }
